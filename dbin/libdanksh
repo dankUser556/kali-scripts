@@ -66,7 +66,7 @@ function kill_wifi() { # Checks status of wlan using rfkill and blocks it if ena
   return 0;
 }
 function boot-arch() { # Reboots the system to the Dank Solutions arch OS
-  local ARCH_ENTRY=$(grep -i Dank /arch-boot/grub/grub.cfg | cut -d"'" -f2 | head -n1);
+  local ARCH_ENTRY=$(sudo grep -i Dank /arch-boot/grub/grub.cfg | cut -d"'" -f2 | head -n1);
 
   sudo grub-reboot "$ARCH_ENTRY"
   systemctl reboot -i
