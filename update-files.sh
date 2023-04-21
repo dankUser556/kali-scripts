@@ -23,7 +23,9 @@ function update_files() {
       printf "Copy %s to %s?\n:" ${f_source} ${f_dest};
       read confirm_action;
       case $confirm_action in
-        y|yes) echo "cp $f_source $f_dest";;
+        y|yes) echo $f_source -\> $f_dest;
+	       echo;
+	       cp $f_source $f_dest;;
         n|no) echo Ignoring $fname;;
         *) echo Invalid response. Try again.; confirm_action='';;
       esac;
