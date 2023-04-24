@@ -33,7 +33,9 @@ function htb_set_ip() { # Checks for valid IP entry and sets HTB_TARGET to entry
     esac;
   fi;
 
-  export HTB_TARGET=$1;
+  dankenv HTB_TARGET $1;
+  register_denv;
+
   echo HTB_TARGET=$HTB_TARGET;
 
   return 0;
@@ -110,7 +112,7 @@ function register_denv() {
 	while read D_VAR; do
 		tgt_name=$(echo $D_VAR | awk '{print $1}');
 		tgt_val=$(echo $D_VAR | awk '{print $2}');
-		eval $tgt_name=$tgt_val;
+		eval export $tgt_name=$tgt_val;
 	done <$DENV_VARS;
 
 	return 0;
