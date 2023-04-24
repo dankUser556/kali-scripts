@@ -104,3 +104,14 @@ function htb_connect() { # Connects to the hackthebox vpn found in /home/dank/Do
 
   return 0;
 };
+function register_denv() {
+	local DENV_VARS="${HOME}/.config/dankenv/denv_vars"
+
+	while read D_VAR; do
+		tgt_name=$(echo $D_VAR | awk '{print $1}');
+		tgt_val=$(echo $D_VAR | awk '{print $2}');
+		eval $tgt_name=$tgt_val;
+	done <$DENV_VARS;
+
+	return 0;
+};
