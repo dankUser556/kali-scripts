@@ -68,9 +68,10 @@ function kill_wifi() { # Checks status of wlan using rfkill and blocks it if ena
 function boot-arch() { # Reboots the system to the Dank Solutions arch OS
   local ARCH_ENTRY=$(sudo grep -i Dank /arch-boot/grub/grub.cfg | cut -d"'" -f2 | head -n1);
 
+  echo $ARCH_ENTRY
   sudo grub-reboot "$ARCH_ENTRY"
-  systemctl reboot -i
-  
+  sudo reboot now
+
   return 0;
 };
 function htb_connect() { # Connects to the hackthebox vpn found in /home/dank/Documents/vpn/
