@@ -13,6 +13,36 @@ function rezdlib() { # Force shell to re-source libdanksh
   source libdanksh;
 };
 
+function htb_connect() { # Connects to the hackthebox vpn found in /home/dank/Documents/vpn/
+  if [[ $# -ne 0 ]]; then
+    for arg in $@; do
+      case $arg in
+        -k)
+          local vpn_pid=$(pgrep openvpn | head -n1);
+          if [[ -z "$vpn_pid" ]]; then echo No vpn running.; fi;
+          while [[ ! -z "$vpn_pid" ]]; do
+            echo Sending SIGTERM to: $vpn_pid
+	    sudo kill -15 $vpn_pid;
+	    vpn_pid=$(pgrep openvpn | head -n1);
+          done;
+	  return 0;;
+	*) echo Arg not recognized: $arg; return 1;;
+      esac;
+    done;
+  fi;
+  vpn_pid=$(pgrep openvpn);
+  if [[ ! -z "$vpn_pid" ]]; then
+	  echo Vpn already open.;
+	  echo PID: $vpn_pid;
+	  return 2;
+  fi;
+  sudo openvpn ~/Documents/vpn/htb.ovpn &> /dev/null & disown;
+
+  sleep 5;
+  pgrep openvpn || echo Error: pgrep did not return a pid for openvpn;
+
+  return 0;
+};
 function htb_set_target() { # Checks for valid IP entry and sets HTB_TARGET to entry
   local errCheck;
   
@@ -38,6 +68,32 @@ function htb_set_target() { # Checks for valid IP entry and sets HTB_TARGET to e
 
   echo HTB_TARGET=$HTB_TARGET;
 
+  return 0;
+};
+function htb_set_hostname() { # Adds HTB_TARGET to /etc/hosts with given hostname
+  local tgt_host_name=$1;
+  local e_host_ip='';
+  local e_host_name='';
+  
+  if [[ -z "$HTB_TARGET" ]]; then
+    echo \"$HTB_TARGET\" is not set!;
+    return 1;
+  fi;
+  
+  while read host_entry; do
+    e_host_ip=$(echo $host_entry|awk '{print $1}');
+    e_host_name=$(echo $host_entry|awk '{print $2}');
+    if [[ "$e_host_ip" == "$HTB_TARGET" ]]; then
+      echo \"$HTB_TARGET\" is in /etc/hosts already.
+      return 2;
+    elif [[ "$e_host_name" == "$tgt_host_name" ]]; then
+      echo \"$tgt_host_name\" is in /etc/hosts already.
+      return 2;
+    fi;
+  done </etc/hosts;
+
+  echo "${HTB_TARGET} ${tgt_host_name}" | sudo tee -a /etc/hosts
+  
   return 0;
 };
 function zsh_err_hndlr() { # Generic error handler for errors in libdanksh functions running under zsh
@@ -73,36 +129,6 @@ function boot-arch() { # Reboots the system to the Dank Solutions arch OS
   echo $ARCH_ENTRY
   sudo grub-reboot "$ARCH_ENTRY"
   sudo reboot now
-
-  return 0;
-};
-function htb_connect() { # Connects to the hackthebox vpn found in /home/dank/Documents/vpn/
-  if [[ $# -ne 0 ]]; then
-    for arg in $@; do
-      case $arg in
-        -k)
-          local vpn_pid=$(pgrep openvpn | head -n1);
-          if [[ -z "$vpn_pid" ]]; then echo No vpn running.; fi;
-          while [[ ! -z "$vpn_pid" ]]; do
-            echo Sending SIGTERM to: $vpn_pid
-	    sudo kill -15 $vpn_pid;
-	    vpn_pid=$(pgrep openvpn | head -n1);
-          done;
-	  return 0;;
-	*) echo Arg not recognized: $arg; return 1;;
-      esac;
-    done;
-  fi;
-  vpn_pid=$(pgrep openvpn);
-  if [[ ! -z "$vpn_pid" ]]; then
-	  echo Vpn already open.;
-	  echo PID: $vpn_pid;
-	  return 2;
-  fi;
-  sudo openvpn ~/Documents/vpn/htb.ovpn &> /dev/null & disown;
-
-  sleep 5;
-  pgrep openvpn || echo Error: pgrep did not return a pid for openvpn;
 
   return 0;
 };
