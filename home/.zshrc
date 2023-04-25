@@ -258,6 +258,10 @@ if [ -f /etc/zsh_command_not_found ]; then
 fi
 
 # Dank Stuff
+export WORDS="/usr/share/wordlists"
+export DIRBL="${WORDS}/dirb"
+export DIRBUSTERL="${WORDS}/dirbuster"
+
 function setPaths() {
   local p_arr=$(echo $PATH|gawk -v FS=":" '{for(i=1;i<NF;i++) print $i}');
   local p_fnd=f;
@@ -283,11 +287,12 @@ alias grub-reboot='sudo grub-reboot';
 alias kill='/usr/bin/kill';
 
 alias scan='nmap -A -T4'
-alias fscan='nmap -A -T4 -p1-65535'
+alias fscan='nmap -sC -A -T4 -p1-65535'
 
 alias zedit='vim /home/dank/.zshrc'
 
 [[ -z "$LIBDANKSH_SOURCED" ]] && . libdanksh;
 
+register_denv;
 dank-fortune;
 kill_wifi;
