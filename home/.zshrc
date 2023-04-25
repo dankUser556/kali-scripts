@@ -261,6 +261,7 @@ fi
 export WORDS="/usr/share/wordlists"
 export DIRBL="${WORDS}/dirb"
 export DIRBUSTERL="${WORDS}/dirbuster"
+export USERLISTS="/opt/SecLists/Usernames"
 
 function setPaths() {
   local p_arr=$(echo $PATH|gawk -v FS=":" '{for(i=1;i<NF;i++) print $i}');
@@ -275,6 +276,7 @@ function setPaths() {
 };
 
 setPaths /home/dank/bin /home/dank/dbin;
+export PAGER='/usr/bin/moar';
 export LS_SORT_TIME='birth';
 
 alias ls='ls -h --color=auto';
