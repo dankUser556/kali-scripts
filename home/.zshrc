@@ -286,10 +286,15 @@ alias openvpn='sudo openvpn'
 alias grub-reboot='sudo grub-reboot';
 alias kill='/usr/bin/kill';
 
-alias scan='nmap -A -T4'
-alias fscan='nmap -sC -A -T4 -p1-65535'
+# nmap aliases
+alias dscan='nmap -sC -A -T4';
+alias dqscan='dscan --min-rate=5000';
+alias dfscan='dscan -p1-65535';
+alias dvscan='dscan -sV';
 
+# quick edit aliases
 alias zedit='vim /home/dank/.zshrc'
+alias vihosts='sudo vim /etc/hosts'
 
 [[ -z "$LIBDANKSH_SOURCED" ]] && . libdanksh;
 
