@@ -6,15 +6,31 @@ REPO_DBIN="${REPO_ROOT}/dbin";
 REPO_HOME="${REPO_ROOT}/home";
 
 function update_files() {
-  for file in $2/*; do
+  case $# in
+    2)
+      local src_dir="$1";
+      local dest_dir="$2";
+      local search_dir="$2/*";;
+    3)
+      if [[ "$1" == "-h" ]] || [[ "$1" == "--hidden" ]]; then
+	local src_dir="$2";
+	local dest_dir="$3";
+	local search_dir="$3/.*";
+      else
+	echo $1 is not an argument.;
+	return 0;
+      fi;;
+  esac;
+
+  for file in $search_dir; do
     if [[ ! -f "$file" ]]; then
       echo $file not a file.
       continue;
     fi;
   
     local fname=$(basename $file);
-    local f_source=$1/${fname};
-    local f_dest=$2/${fname};
+    local f_source=$src_dir/${fname};
+    local f_dest=$dest_dir/${fname};
   
     diff $f_source $f_dest && echo File $fname unchanged. && continue;
 
@@ -33,5 +49,5 @@ function update_files() {
   done;
 };
 
-update_files $HOME $REPO_HOME;
+update_files -h $HOME $REPO_HOME;
 update_files $DBIN $REPO_DBIN;
