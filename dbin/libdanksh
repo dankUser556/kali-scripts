@@ -13,7 +13,7 @@ function rezdlib() { # Force shell to re-source libdanksh
   source libdanksh;
 };
 
-function htb_set_ip() { # Checks for valid IP entry and sets HTB_TARGET to entry
+function htb_set_target() { # Checks for valid IP entry and sets HTB_TARGET to entry
   local errCheck;
   
   if [[ ! -z "${1}" ]]; then
@@ -106,7 +106,7 @@ function htb_connect() { # Connects to the hackthebox vpn found in /home/dank/Do
 
   return 0;
 };
-function register_denv() {
+function register_denv() { # Import environment variables stored in dankenv config
 	local DENV_VARS="${HOME}/.config/dankenv/denv_vars"
 
 	while read D_VAR; do
