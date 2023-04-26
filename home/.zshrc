@@ -47,17 +47,17 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # History configurations
-HISTFILE=~/.zsh_history
-HISTSIZE=1000
-SAVEHIST=2000
+HISTFILE=~/.config/zsh/.zsh_history
+HISTSIZE=50000
+SAVEHIST=100000
 setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
 setopt hist_ignore_dups       # ignore duplicated commands history list
 setopt hist_ignore_space      # ignore commands that start with space
 setopt hist_verify            # show command with history expansion to user before running it
-#setopt share_history         # share command history data
+setopt share_history          # share command history data
 
-# force zsh to show the complete history
-alias history="history 0"
+# force zsh to show the last 50 commands
+alias history="history 50"
 
 # configure `time` format
 TIMEFMT=$'\nreal\t%E\nuser\t%U\nsys\t%S\ncpu\t%P'
@@ -99,7 +99,7 @@ configure_prompt() {
         twoline)
             PROMPT=$'%F{%(#.blue.green)}┌──${debian_chroot:+($debian_chroot)─}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))─}(%B%F{%(#.red.blue)}%n'$prompt_symbol$'%m%b%F{%(#.blue.green)})-[%B%F{reset}%(6~.%-1~/…/%4~.%5~)%b%F{%(#.blue.green)}]\n└─%B%(#.%F{red}#.%F{blue}$)%b%F{reset} '
             # Right-side prompt with exit codes and background processes
-            #RPROMPT=$'%(?.. %? %F{red}%B⨯%b%F{reset})%(1j. %j %F{yellow}%B⚙%b%F{reset}.)'
+            RPROMPT=$'%(?.. %? %F{red}%B⨯%b%F{reset})%(1j. %j %F{yellow}%B⚙%b%F{reset}.)'
             ;;
         oneline)
             PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{%(#.red.blue)}%n@%m%b%F{reset}:%B%F{%(#.blue.green)}%~%b%F{reset}%(#.#.$) '
@@ -240,11 +240,6 @@ if [ -x /usr/bin/dircolors ]; then
     zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 fi
 
-# some more ls aliases
-alias ll='ls -l'
-#alias la='ls -A'
-#alias l='ls -CF'
-
 # enable auto-suggestions based on the history
 if [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
     . /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -258,47 +253,65 @@ if [ -f /etc/zsh_command_not_found ]; then
 fi
 
 # Dank Stuff
-export WORDS="/usr/share/wordlists"
-export DIRBL="${WORDS}/dirb"
-export DIRBUSTERL="${WORDS}/dirbuster"
-export USERLISTS="/opt/SecLists/Usernames"
+#
+# Standard dank env setup
+export WORDS="/usr/share/wordlists";
+export DIRBL="${WORDS}/dirb";
+export DIRBUSTERL="${WORDS}/dirbuster";
+export USERLISTS="/opt/SecLists/Usernames";
+export PAGER='/usr/bin/moar';
+export LS_SORT_TIME='birth';
+export ZSHRC="${HOME}/.zshrc";
+export GITSCRDIR="${HOME}/my-github/kali-scripts";
+export DBINDIR="${HOME}/dbin";
+export HBINDIR="${HOME}/bin";
 
 function setPaths() {
   local p_arr=$(echo $PATH|gawk -v FS=":" '{for(i=1;i<NF;i++) print $i}');
   local p_fnd=f;
 
   for p in $@; do p_fnd=f; for p2 in $p_arr; do
-    if [[ "$p" == "$p2" ]]; then p_fnd=t; break; fi; done;
-    if [[ "$p_fnd" == f ]]; then PATH="${PATH}:${p}"; fi;
+    if [ "$p" == "$p2" ]; then p_fnd=t; break; fi; done;
+    if [ "$p_fnd" == f ]; then PATH="${PATH}:${p}"; fi;
   done;
 
   return 0;
 };
 
-setPaths /home/dank/bin /home/dank/dbin;
-export PAGER='/usr/bin/moar';
-export LS_SORT_TIME='birth';
-
+# ls enhancers
 alias ls='ls -h --color=auto';
 alias la='echo Sorting time by: $LS_SORT_TIME && ls -lrhA --color=auto --time=$LS_SORT_TIME --sort=time';
 alias l='/bin/ls -1';
 alias lw='/bin/ls';
-
-alias openvpn='sudo openvpn'
-alias grub-reboot='sudo grub-reboot';
-alias kill='/usr/bin/kill';
+alias ll='ls -l';
+#alias la='ls -A';
+#alias l='ls -CF';
 
 # nmap aliases
+alias lsdscan='grep scan $ZSHRC';
 alias dscan='nmap -sC -A -T4';
 alias dqscan='dscan --min-rate=5000';
 alias dfscan='dscan -p1-65535';
 alias dvscan='dscan -sV';
 
+# quick macros
+alias g-update="pushd ${GITSCRDIR}; ./update-files.sh; git status; popd;";
+alias goto-git="pushd ${GITSCRDIR}";
+alias goto-dbin="pushd ${DBINDIR}";
+alias goto-hbin="pushd ${HBINDIR}";
+
 # quick edit aliases
-alias zedit='vim /home/dank/.zshrc'
+alias zedit='vim ${ZSHRC}'
 alias vihosts='sudo vim /etc/hosts'
 
-[[ -z "$LIBDANKSH_SOURCED" ]] && . libdanksh;
+# sudo'd and other augmented aliases
+alias openvpn='sudo openvpn'
+alias grub-reboot='sudo grub-reboot';
+#alias kill='sudo /usr/bin/kill';
+
+
+setPaths /home/dank/bin /home/dank/dbin;
+[ -z "$LIBDANKSH_SOURCED" ] && . libdanksh;
 
 register_denv;
 dank-fortune;
