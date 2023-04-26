@@ -11,6 +11,13 @@ function dank_functions() { # Display functions sourced from libdanksh
 function rezdlib() { # Force shell to re-source libdanksh
   unset LIBDANKSH_SOURCED;
   source libdanksh;
+
+  return 0;
+};
+function rezzsh() {
+  source ${HOME}/.zshrc
+
+  return 0;
 };
 
 function htb_connect() { # Connects to the hackthebox vpn found in /home/dank/Documents/vpn/
